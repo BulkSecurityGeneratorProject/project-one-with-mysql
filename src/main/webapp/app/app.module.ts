@@ -17,6 +17,8 @@ import { ProjectOneWithMysqlAppRoutingModule } from './app-routing.module';
 import { ProjectOneWithMysqlHomeModule } from './home/home.module';
 import { ProjectOneWithMysqlAccountModule } from './account/account.module';
 import { ProjectOneWithMysqlEntityModule } from './entities/entity.module';
+import { ProjectOneWithMysqlBoardModule } from 'app/board/board.module';
+
 import * as moment from 'moment';
 // jhipster-needle-angular-add-module-import JHipster will add new module here
 import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent, ErrorComponent } from './layouts';
@@ -36,6 +38,7 @@ import { JhiMainComponent, NavbarComponent, FooterComponent, PageRibbonComponent
     ProjectOneWithMysqlAccountModule,
     // jhipster-needle-angular-add-module JHipster will add new module here
     ProjectOneWithMysqlEntityModule,
+    ProjectOneWithMysqlBoardModule,
     ProjectOneWithMysqlAppRoutingModule
   ],
   declarations: [JhiMainComponent, NavbarComponent, ErrorComponent, PageRibbonComponent, FooterComponent],

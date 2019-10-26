@@ -17,6 +17,7 @@ import {
   JhiConfigurationComponent,
   JhiDocsComponent
 } from './';
+import { CustomUserMgmtUpdateComponent } from 'app/admin/user-management/custom-user-management-update.component';
 
 @NgModule({
   imports: [
@@ -29,6 +30,7 @@ import {
     UserMgmtComponent,
     UserMgmtDetailComponent,
     UserMgmtUpdateComponent,
+    CustomUserMgmtUpdateComponent,
     UserMgmtDeleteDialogComponent,
     LogsComponent,
     JhiConfigurationComponent,

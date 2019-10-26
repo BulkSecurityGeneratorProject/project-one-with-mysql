@@ -13,6 +13,10 @@ const LAYOUT_ROUTES = [navbarRoute, ...errorRoute];
           path: 'admin',
           loadChildren: () => import('./admin/admin.module').then(m => m.ProjectOneWithMysqlAdminModule)
         },
+        {
+          path: 'board',
+          loadChildren: () => import('./board/board.module').then(m => m.ProjectOneWithMysqlBoardModule)
+        },
         ...LAYOUT_ROUTES
       ],
       { enableTracing: DEBUG_INFO_ENABLED }

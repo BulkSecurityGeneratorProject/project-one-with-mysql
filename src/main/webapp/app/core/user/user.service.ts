@@ -16,6 +16,10 @@ export class UserService {
     return this.http.post<IUser>(this.resourceUrl, user, { observe: 'response' });
   }
 
+  customCreate(user: IUser): Observable<HttpResponse<IUser>> {
+    return this.http.post<IUser>(this.resourceUrl + '/custom', user, { observe: 'response' });
+  }
+
   update(user: IUser): Observable<HttpResponse<IUser>> {
     return this.http.put<IUser>(this.resourceUrl, user, { observe: 'response' });
   }
@@ -27,6 +31,11 @@ export class UserService {
   query(req?: any): Observable<HttpResponse<IUser[]>> {
     const options = createRequestOption(req);
     return this.http.get<IUser[]>(this.resourceUrl, { params: options, observe: 'response' });
+  }
+
+  customQuery(req?: any): Observable<HttpResponse<IUser[]>> {
+    const options = createRequestOption(req);
+    return this.http.get<IUser[]>(this.resourceUrl + '/custom', { params: options, observe: 'response' });
   }
 
   delete(login: string): Observable<HttpResponse<any>> {

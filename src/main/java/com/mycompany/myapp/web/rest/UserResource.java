@@ -1,11 +1,14 @@
 package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.config.Constants;
+import com.mycompany.myapp.domain.CustomUser;
 import com.mycompany.myapp.domain.User;
+import com.mycompany.myapp.repository.CustomUserRepository;
 import com.mycompany.myapp.repository.UserRepository;
 import com.mycompany.myapp.security.AuthoritiesConstants;
 import com.mycompany.myapp.service.MailService;
 import com.mycompany.myapp.service.UserService;
+import com.mycompany.myapp.service.dto.CustomUserDTO;
 import com.mycompany.myapp.service.dto.UserDTO;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 import com.mycompany.myapp.web.rest.errors.EmailAlreadyUsedException;
@@ -69,11 +72,13 @@ public class UserResource {
 
     private final UserRepository userRepository;
 
+    private final CustomUserRepository customUserRepository;
+
     private final MailService mailService;
 
-    public UserResource(UserService userService, UserRepository userRepository, MailService mailService) {
-
+    public UserResource(UserService userService, CustomUserRepository customUserRepository, UserRepository userRepository, MailService mailService) {
         this.userService = userService;
+        this.customUserRepository = customUserRepository;
         this.userRepository = userRepository;
         this.mailService = mailService;
     }
@@ -105,6 +110,27 @@ public class UserResource {
         } else {
             User newUser = userService.createUser(userDTO);
             mailService.sendCreationEmail(newUser);
+            return ResponseEntity.created(new URI("/api/users/" + newUser.getLogin()))
+                .headers(HeaderUtil.createAlert(applicationName,  "A user is created with identifier " + newUser.getLogin(), newUser.getLogin()))
+                .body(newUser);
+        }
+    }
+
+    @PostMapping("/users/custom")
+    @PreAuthorize("hasRole(\"" + AuthoritiesConstants.ADMIN + "\")")
+    public ResponseEntity<CustomUser> customCreateUser(@Valid @RequestBody CustomUserDTO userDTO) throws URISyntaxException {
+        log.debug("REST request to save User : {}", userDTO);
+
+        if (userDTO.getId() != null) {
+            throw new BadRequestAlertException("A new user cannot already have an ID", "userManagement", "idexists");
+            // Lowercase the user login before comparing with database
+        } else if (customUserRepository.findOneByLogin(userDTO.getLogin().toLowerCase()).isPresent()) {
+            throw new LoginAlreadyUsedException();
+        } else if (customUserRepository.findOneByEmailIgnoreCase(userDTO.getEmail()).isPresent()) {
+            throw new EmailAlreadyUsedException();
+        } else {
+            CustomUser newUser = userService.customCreateUser(userDTO);
+            mailService.sendCustomCreationEmail(newUser);
             return ResponseEntity.created(new URI("/api/users/" + newUser.getLogin()))
                 .headers(HeaderUtil.createAlert(applicationName,  "A user is created with identifier " + newUser.getLogin(), newUser.getLogin()))
                 .body(newUser);
@@ -146,6 +172,13 @@ public class UserResource {
     @GetMapping("/users")
     public ResponseEntity<List<UserDTO>> getAllUsers(Pageable pageable) {
         final Page<UserDTO> page = userService.getAllManagedUsers(pageable);
+        HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
+        return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
+    }
+
+    @GetMapping("/users/custom")
+    public ResponseEntity<List<CustomUserDTO>> getAllCustomUsers(Pageable pageable) {
+        final Page<CustomUserDTO> page = userService.getAllManagedCustomUsers(pageable);
         HttpHeaders headers = PaginationUtil.generatePaginationHttpHeaders(ServletUriComponentsBuilder.fromCurrentRequest(), page);
         return new ResponseEntity<>(page.getContent(), headers, HttpStatus.OK);
     }

@@ -1,5 +1,6 @@
 package com.mycompany.myapp.service;
 
+import com.mycompany.myapp.domain.CustomUser;
 import com.mycompany.myapp.domain.User;
 
 import io.github.jhipster.config.JHipsterProperties;
@@ -85,6 +86,17 @@ public class MailService {
     }
 
     @Async
+    public void customSendEmailFromTemplate(CustomUser user, String templateName, String titleKey) {
+        Locale locale = Locale.forLanguageTag(user.getLangKey());
+        Context context = new Context(locale);
+        context.setVariable(USER, user);
+        context.setVariable(BASE_URL, jHipsterProperties.getMail().getBaseUrl());
+        String content = templateEngine.process(templateName, context);
+        String subject = messageSource.getMessage(titleKey, null, locale);
+        sendEmail(user.getEmail(), subject, content, false, true);
+    }
+
+    @Async
     public void sendActivationEmail(User user) {
         log.debug("Sending activation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, "mail/activationEmail", "email.activation.title");
@@ -94,6 +106,12 @@ public class MailService {
     public void sendCreationEmail(User user) {
         log.debug("Sending creation email to '{}'", user.getEmail());
         sendEmailFromTemplate(user, "mail/creationEmail", "email.activation.title");
+    }
+
+    @Async
+    public void sendCustomCreationEmail(CustomUser user) {
+        log.debug("Sending creation email to '{}'", user.getEmail());
+        customSendEmailFromTemplate(user, "mail/creationEmail", "email.activation.title");
     }
 
     @Async

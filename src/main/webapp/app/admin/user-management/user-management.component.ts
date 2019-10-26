@@ -16,6 +16,7 @@ import { UserMgmtDeleteDialogComponent } from './user-management-delete-dialog.c
 export class UserMgmtComponent implements OnInit, OnDestroy {
   currentAccount: any;
   users: User[];
+  customUsers: User[];
   error: any;
   success: any;
   routeData: any;
@@ -85,6 +86,17 @@ export class UserMgmtComponent implements OnInit, OnDestroy {
         sort: this.sort()
       })
       .subscribe((res: HttpResponse<User[]>) => this.onSuccess(res.body, res.headers), (res: HttpResponse<any>) => this.onError(res.body));
+
+    this.userService
+      .customQuery({
+        page: this.page - 1,
+        size: this.itemsPerPage,
+        sort: this.sort()
+      })
+      .subscribe(
+        (res: HttpResponse<User[]>) => this.customOnSuccess(res.body, res.headers),
+        (res: HttpResponse<any>) => this.onError(res.body)
+      );
   }
 
   trackIdentity(index, item: User) {
@@ -133,6 +145,12 @@ export class UserMgmtComponent implements OnInit, OnDestroy {
     this.links = this.parseLinks.parse(headers.get('link'));
     this.totalItems = headers.get('X-Total-Count');
     this.users = data;
+  }
+
+  private customOnSuccess(data, headers) {
+    this.links = this.parseLinks.parse(headers.get('link'));
+    this.totalItems = headers.get('X-Total-Count');
+    this.customUsers = data;
   }
 
   private onError(error) {

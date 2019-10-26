@@ -4,6 +4,7 @@ import { JhiPaginationUtil, JhiResolvePagingParams } from 'ng-jhipster';
 
 import { AccountService, User, UserService } from 'app/core';
 import { UserMgmtComponent } from './user-management.component';
+import { CustomUserMgmtUpdateComponent } from 'app/admin/user-management/custom-user-management-update.component';
 import { UserMgmtDetailComponent } from './user-management-detail.component';
 import { UserMgmtUpdateComponent } from './user-management-update.component';
 
@@ -54,6 +55,13 @@ export const userMgmtRoute: Routes = [
   {
     path: 'user-management/new',
     component: UserMgmtUpdateComponent,
+    resolve: {
+      user: UserMgmtResolve
+    }
+  },
+  {
+    path: 'user-management/custom-new',
+    component: CustomUserMgmtUpdateComponent,
     resolve: {
       user: UserMgmtResolve
     }
