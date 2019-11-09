@@ -30,12 +30,15 @@ public class Board implements Serializable {
     @Column(name = "createtime")
     private LocalDate createtime;
 
-    @Lob
+    @Column(name = "imagelink")
+    private String imagelink;
+
+    /*@Lob
     @Column(name = "image")
     private byte[] image;
 
     @Column(name = "image_content_type")
-    private String imageContentType;
+    private String imageContentType;*/
 
     // jhipster-needle-entity-add-field - JHipster will add fields here, do not remove
     public Long getId() {
@@ -85,7 +88,20 @@ public class Board implements Serializable {
         this.createtime = createtime;
     }
 
-    public byte[] getImage() {
+    public String getImagelink() {
+        return imagelink;
+    }
+
+    public Board imagelink(String imagelink) {
+        this.imagelink = imagelink;
+        return this;
+    }
+
+    public void setImagelink(String imagelink) {
+        this.imagelink = imagelink;
+    }
+
+    /*public byte[] getImage() {
         return image;
     }
 
@@ -111,7 +127,7 @@ public class Board implements Serializable {
         this.imageContentType = imageContentType;
     }
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here, do not remove
-
+    */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -135,8 +151,9 @@ public class Board implements Serializable {
             ", title='" + getTitle() + "'" +
             ", contents='" + getContents() + "'" +
             ", createtime='" + getCreatetime() + "'" +
-            ", image='" + getImage() + "'" +
-            ", imageContentType='" + getImageContentType() + "'" +
+            ", imagelink='" + getImagelink() + "'" +
+            //", image='" + getImage() + "'" +
+            //", imageContentType='" + getImageContentType() + "'" +
             "}";
     }
 }

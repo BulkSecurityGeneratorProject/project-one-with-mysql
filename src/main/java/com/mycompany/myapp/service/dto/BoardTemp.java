@@ -1,16 +1,8 @@
 package com.mycompany.myapp.service.dto;
-import com.mycompany.myapp.domain.Board;
 
 import java.time.LocalDate;
-import java.io.Serializable;
-import java.util.Objects;
-import javax.persistence.Lob;
 
-/**
- * A DTO for the {@link com.mycompany.myapp.domain.Board} entity.
- */
-public class BoardDTO implements Serializable {
-
+public class BoardTemp {
     private Long id;
 
     private String title;
@@ -19,23 +11,21 @@ public class BoardDTO implements Serializable {
 
     private LocalDate createtime;
 
-    private String imagelink;
-
-    /*@Lob
     private byte[] image;
 
-    private String imageContentType;*/
+    private String imageContentType;
 
-    public BoardDTO() {
-        // Empty constructor needed for Jackson.
+    public BoardTemp() {
+
     }
 
-    public BoardDTO(Long id, String title, String contents, LocalDate createtime, String imagelink) {
+    public BoardTemp(Long id, String title, String contents, LocalDate createtime, byte[] image, String imageContentType) {
         this.id = id;
         this.title = title;
         this.contents = contents;
         this.createtime = createtime;
-        this.imagelink = imagelink;
+        this.image = image;
+        this.imageContentType = imageContentType;
     }
 
     public Long getId() {
@@ -70,19 +60,9 @@ public class BoardDTO implements Serializable {
         this.createtime = createtime;
     }
 
-    public String getImagelink() {
-        return imagelink;
-    }
-
-    public void setImagelink(String imagelink) {
-        this.imagelink = imagelink;
-    }
-
-    /*
     public byte[] getImage() {
         return image;
     }
-
 
     public void setImage(byte[] image) {
         this.image = image;
@@ -95,38 +75,17 @@ public class BoardDTO implements Serializable {
     public void setImageContentType(String imageContentType) {
         this.imageContentType = imageContentType;
     }
-    */
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        BoardDTO boardDTO = (BoardDTO) o;
-        if (boardDTO.getId() == null || getId() == null) {
-            return false;
-        }
-        return Objects.equals(getId(), boardDTO.getId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hashCode(getId());
-    }
 
     @Override
     public String toString() {
-        return "BoardDTO{" +
+        return "BoardTemp{" +
             "id=" + getId() +
             ", title='" + getTitle() + "'" +
             ", contents='" + getContents() + "'" +
             ", createtime='" + getCreatetime() + "'" +
-            ", imagelink='" + getImagelink() + "'" +
-            //", image='" + getImage() + "'" +
+            ", image='" + getImage() + "'" +
+            ", imagetype='" + getImageContentType() + "'" +
             "}";
     }
+
 }

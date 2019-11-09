@@ -3,6 +3,7 @@ package com.mycompany.myapp.service;
 import com.mycompany.myapp.domain.Board;
 import com.mycompany.myapp.repository.BoardRepository;
 import com.mycompany.myapp.service.dto.BoardDTO;
+import com.mycompany.myapp.service.dto.BoardTemp;
 import com.mycompany.myapp.service.mapper.BoardMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,6 +13,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 /**
@@ -68,8 +73,7 @@ public class BoardService {
     @Transactional(readOnly = true)
     public Optional<BoardDTO> findOne(Long id) {
         log.debug("Request to get Board : {}", id);
-        return boardRepository.findById(id)
-            .map(boardMapper::toDto);
+        return boardRepository.findById(id).map(boardMapper::toDto);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.mycompany.myapp.web.rest;
 
 import com.mycompany.myapp.service.BoardService;
 import com.mycompany.myapp.service.dto.BoardDTO;
+import com.mycompany.myapp.service.dto.BoardTemp;
 import com.mycompany.myapp.web.rest.errors.BadRequestAlertException;
 
 import io.github.jhipster.web.util.HeaderUtil;
@@ -13,16 +14,20 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * REST controller for managing {@link com.mycompany.myapp.domain.Board}.
@@ -52,15 +57,33 @@ public class BoardResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/board")
-    public ResponseEntity<BoardDTO> createBoard(@RequestBody BoardDTO boardDTO) throws URISyntaxException {
-        log.debug("REST request to save Board : {}", boardDTO);
-        if (boardDTO.getId() != null) {
-            throw new BadRequestAlertException("A new board cannot already have an ID", ENTITY_NAME, "idexists");
+    public ResponseEntity<BoardDTO> createBoard(@RequestBody BoardTemp boardTemp /*@RequestBody BoardDTO boardDTO*/) throws URISyntaxException {
+        log.debug("data received: {}", boardTemp);
+        String imagelink = "";
+        try{
+            byte[] image = boardTemp.getImage();
+            imagelink = "C://Users//junse//projectOneWithMysql//src//main//java//com//mycompany//myapp//images//" + boardTemp.getCreatetime().toString() + boardTemp.getTitle() + boardTemp.getContents() + "." + boardTemp.getImageContentType().split("/")[1];
+            Path path = Paths.get(imagelink);
+            Files.write(path, image);
+
+        }catch (IOException e) {
+            e.printStackTrace();
         }
-        BoardDTO result = boardService.save(boardDTO);
-        return ResponseEntity.created(new URI("/api/board/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-            .body(result);
+        finally {
+            log.debug("File upload Successful!");
+            BoardDTO boardDTO = new BoardDTO(boardTemp.getId(), boardTemp.getTitle(), boardTemp.getContents(), boardTemp.getCreatetime(), imagelink);
+            log.debug("REST request to save Board : {}", boardDTO);
+            if (boardDTO.getId() != null) {
+                throw new BadRequestAlertException("A new board cannot already have an ID", ENTITY_NAME, "idexists");
+            }
+
+            BoardDTO result = boardService.save(boardDTO);
+
+            return ResponseEntity.created(new URI("/api/board/" + result.getId()))
+                .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
+                .body(result);
+        }
+
     }
 
     /**
@@ -107,10 +130,26 @@ public class BoardResource {
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and with body the boardDTO, or with status {@code 404 (Not Found)}.
      */
     @GetMapping("/board/{id}")
-    public ResponseEntity<BoardDTO> getBoard(@PathVariable Long id) {
+    public ResponseEntity<BoardTemp> getBoard(@PathVariable Long id) {
         log.debug("REST request to get Board : {}", id);
-        Optional<BoardDTO> boardDTO = boardService.findOne(id);
-        return ResponseUtil.wrapOrNotFound(boardDTO);
+        Optional<BoardDTO> optionalBoardDTO = boardService.findOne(id);
+
+        BoardTemp boardTemp = new BoardTemp();
+        try{
+            BoardDTO boardDTO = optionalBoardDTO.get();
+            String imagelink = boardDTO.getImagelink();
+            Path path = Paths.get(imagelink);
+            String imageContentType = "image/jpeg";
+            byte[] image = Files.readAllBytes(path);
+            log.debug("File read Successful!");
+            boardTemp = new BoardTemp(boardDTO.getId(), boardDTO.getTitle(), boardDTO.getContents(), boardDTO.getCreatetime(), image, imageContentType);
+        }catch (IOException e) {
+            e.printStackTrace();
+            return ResponseUtil.wrapOrNotFound(Optional.empty());
+        }
+        finally{
+            return ResponseUtil.wrapOrNotFound(Optional.of(boardTemp));
+        }
     }
 
     /**
